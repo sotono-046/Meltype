@@ -182,7 +182,14 @@ final class MeltypeInputController: IMKInputController {
 
     @objc private func importUserDictionary(_ sender: Any?) {
         commitComposition(client())
+        let application = NSApplication.shared
+        let previousPolicy = application.activationPolicy()
+        application.setActivationPolicy(.accessory)
+        defer { application.setActivationPolicy(previousPolicy) }
+        application.activate(ignoringOtherApps: true)
         let panel = NSOpenPanel()
+        panel.directoryURL = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/KeyboardServices", isDirectory: true)
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         guard panel.runModal() == .OK, let source = panel.url,
